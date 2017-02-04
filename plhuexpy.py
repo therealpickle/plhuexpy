@@ -9,7 +9,8 @@ class PlexHandler(object):
     def plexjson(self):
         payload = cherrypy.request.json
         print payload
-        return "Fucking A Man!"
+        return str(payload)
+
 
 
 if __name__ == '__main__':
