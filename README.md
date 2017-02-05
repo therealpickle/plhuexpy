@@ -5,6 +5,7 @@ A python server to control Hue lights with Plex webhooks.
 cherrypy
 pyyaml
 phue
+colormath
 
 
 # Starting Goals
@@ -31,3 +32,18 @@ With these rule outputs for each light:
 # other thoughts
 * need to handle the initial connection and token with hue
 * 
+
+
+('127.0.0.1', 42937)
+POST
+/
+
+header:
+
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36
+Host: localhost:38148
+Accept: */*
+Accept-Encoding: gzip
+Content-Length: 6984
+Content-Type: multipart/form-data; boundary=----------------------------d046b704a3fd
+
