@@ -1,5 +1,6 @@
 import yaml
 
+from hue_helper import rgb_to_xy, xy_to_rgb
 
 
 class Condition(object):
@@ -48,11 +49,43 @@ class Action(object):
 class HueAction(Action):
     '''
     items: [] #can be room, group or light name
-        on: <true or false>  
+    settings:    
+        turn_on: <true or false>  
         color: [r,g,b]
         brightness: 0 - 255
     '''
 
+    def execute(self,bridge):
+        # first thing to do is get a list of lights that are described
+        # by a room, group or lights
+        light_list = []
+        if 'items' in self.task.keys():
+            for item in self.task['items']:
+                if item in [g.name for g in bridge.groups]:
+                    gdict = bridge.get_group(item)
+                    for lid in gdict['lights']:
+                        light = bridge.get_light(light_id=int(lid))
+                        light_list.append(light['name'])
+                elif item in [l.name for l in bridge.lights]:
+                    light = bridge.get_light(item)
+                    light_list.append(light['name'])
+
+        print light_list
+        if len(light_list) > 0 and 'settings' in self.task.keys():
+            for light in light_list:
+                command = {}
+                if 'turn_on' in self.task['settings']:
+                    command['on'] = self.task['settings']['turn_on']
+                if 'color' in self.task['settings']:
+                    pass
+                if 'brightness' in self.task['settings']:
+                    command['bri'] = int(self.task['settings']['brightness'])
+                if 'transition_time' in self.task['settings']:
+                    command['transitiontime'] = int(self.task['settings']['transition_time'])
+
+                print light, command
+                
+                bridge.set_light(light,command)
 
 class Rule(object):
     def __init__(self,conditions,actions):

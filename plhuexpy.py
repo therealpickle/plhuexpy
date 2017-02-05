@@ -5,7 +5,7 @@ import yaml
 import time
 import json
 
-from rules import PlexCondition
+from rules import PlexCondition, HueAction
 
 cherrypy.config.update({'server.socket_port': 38148,
                         'tools.encode.encoding': "utf-8",
@@ -40,12 +40,38 @@ class PlexHandler(object):
         # print res
         
 
+
+
         # action test
-        lights = bridge.get_light_objects('name')
-        for light in ['Bedroom Ceiling Color 1','Bedroom Ceiling Color 2']:
-            if light in lights.keys():
-                lights[light].on = not res
-                
+        task_on = '''
+        items: ['Bedroom Ceiling Color 1','Bedroom Ceiling Color 2','Family Room']
+        settings:
+            brightness: 150
+            transition_time: 20
+        '''
+
+        task_off = '''
+        items: ['Bedroom Ceiling Color 1','Bedroom Ceiling Color 2','Family Room']
+        settings:
+            brightness: 25
+        '''
+
+
+        action_on = HueAction(yaml.load(task_on))
+        action_off = HueAction(yaml.load(task_off))
+        
+        if res:
+            print "off"
+            action_off.execute(bridge)
+        else:
+            print "on"
+            action_on.execute(bridge)
+
+        # lights = bridge.get_light_objects('name')
+        # for light in ['Bedroom Ceiling Color 1','Bedroom Ceiling Color 2']:
+        #     if light in lights.keys():
+        #         lights[light].on = not res
+        #         print lights[light]
 
 if __name__ == '__main__':
 
