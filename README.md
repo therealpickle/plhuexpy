@@ -60,6 +60,9 @@ A python server to control Hue lights with Plex webhooks. Rules are set with a y
 # Example Usage
 `python plhuexpy.py --bridge-ip <ip_address_of_bridge> --rules path/to/rule/file`
 
+## Don't forget to add your plex webhook
+`http://<server_address>:38148`
+
 # Wishlist / ToDo
 * add scene handling in hue action
 * web interface to setup rules
