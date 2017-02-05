@@ -1,5 +1,5 @@
 # plhuexpy
-A python server to control Hue lights with Plex webhooks.
+A python server to control Hue lights with Plex webhooks. Rules are set with a yaml file.
 
 # Requirements
 * cherrypy
@@ -11,28 +11,50 @@ A python server to control Hue lights with Plex webhooks.
 ```yaml
 - rule:
     - plex_condition:
-        events: [media.play,media.resume]
+        events: [media.resume]
         players:
             local: [true]
             title: [Plex Web (Chrome)]
     - hue_action:
-        items: ["Mason's Nightstand"]
+        items: [Bedroom]
         settings:
             turn_on: true
             brightness: 25
-            color: [255,0,0]
+            color_cie: [0.7,0.3]
 - rule:
     - plex_condition:
-        events: [media.pause,media.stop]
+        events: [media.pause]
         players:
             local: [true]
             title: [Plex Web (Chrome)]
     - hue_action:
-        items: ["Mason's Nightstand"]
+        items: [Bedroom]
         settings:
             turn_on: true
             brightness: 25
-            color: [0,0,255]
+            color_hsv: [0.666,1,1]
+- rule:
+    - plex_condition:
+        events: [media.play]
+        players:
+            local: [true]
+            title: [Plex Web (Chrome)]
+    - hue_save_action:
+        name: before_play
+        items: [Bedroom]
+    - hue_action:
+        items: [Bedroom]
+        settings:
+            brightness: 25
+- rule:
+    - plex_condition:
+        events: [media.stop]
+        players:
+            local: [true]
+            title: [Plex Web (Chrome)]
+    - hue_load_action: 
+        name: before_play
+        transition_time: 30
 ```
 
 # Example Usage
