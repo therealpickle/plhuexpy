@@ -2,10 +2,9 @@
 A python server to control Hue lights with Plex webhooks.
 
 # Requirements
-cherrypy
-pyyaml
-phue
-colormath
+* cherrypy
+* pyyaml
+* phue
 
 
 # Example Rule Set
@@ -35,6 +34,9 @@ colormath
             brightness: 25
             color: [0,0,255]
 ```
+
+# Example Usage
+`python plhuexpy.py --bridge-ip <ip_address_of_bridge> --rules path/to/rule/file`
 
 # Still TODO
 * add scene handling in hue action
