@@ -29,7 +29,7 @@ class PlexHandler(object):
         
         req = '''
         events: [media.play,media.resume]
-        players: 
+        players:
             local: [true]
             title: [Plex Web (Chrome)]
         '''
@@ -44,16 +44,19 @@ class PlexHandler(object):
 
         # action test
         task_on = '''
-        items: ['Bedroom Ceiling Color 1','Bedroom Ceiling Color 2','Family Room']
+        items: ["Mason's Nightstand"]
         settings:
-            brightness: 150
-            transition_time: 20
+            turn_on: true
+            brightness: 25
+            color: [255,0,0]
         '''
 
         task_off = '''
-        items: ['Bedroom Ceiling Color 1','Bedroom Ceiling Color 2','Family Room']
+        items: ["Mason's Nightstand"]
         settings:
+            turn_on: true
             brightness: 25
+            color: [0,0,255]
         '''
 
 

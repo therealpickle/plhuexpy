@@ -1,7 +1,5 @@
 import yaml
-
-from hue_helper import rgb_to_xy, xy_to_rgb
-
+import colorsys
 
 class Condition(object):
     def __init__(self,req):
@@ -77,7 +75,12 @@ class HueAction(Action):
                 if 'turn_on' in self.task['settings']:
                     command['on'] = self.task['settings']['turn_on']
                 if 'color' in self.task['settings']:
-                    pass
+                    h,s,v = colorsys.rgb_to_hsv(*[float(c)/255.0 for c in self.task['settings']['color']])
+                    print h,s,v
+
+                    command['hue'] = int(h*65535.0)
+                    command['sat'] = int(s*255.0)
+                    
                 if 'brightness' in self.task['settings']:
                     command['bri'] = int(self.task['settings']['brightness'])
                 if 'transition_time' in self.task['settings']:
