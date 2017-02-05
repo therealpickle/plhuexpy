@@ -1,24 +1,47 @@
 - rule:
     - plex_condition:
-        events: [media.play,media.resume]
+        events: [media.resume]
         players:
             local: [true]
             title: [Plex Web (Chrome)]
     - hue_action:
-        items: ["Mason's Nightstand"]
+        items: [Bedroom]
         settings:
             turn_on: true
             brightness: 25
             color: [255,0,0]
 - rule:
     - plex_condition:
-        events: [media.pause,media.stop]
+        events: [media.pause]
         players:
             local: [true]
             title: [Plex Web (Chrome)]
     - hue_action:
-        items: ["Mason's Nightstand"]
+        items: [Bedroom]
         settings:
             turn_on: true
             brightness: 25
             color: [0,0,255]
+- rule:
+    - plex_condition:
+        events: [media.play]
+        players:
+            local: [true]
+            title: [Plex Web (Chrome)]
+    - hue_save_action:
+        name: before_play
+        items: [Bedroom]
+    - hue_action:
+        items: [Bedroom]
+        settings:
+            brightness: 25
+
+- rule:
+    - plex_condition:
+        events: [media.stop]
+        players:
+            local: [true]
+            title: [Plex Web (Chrome)]
+    - hue_load_action: 
+        name: before_play
+        transition_time: 30
