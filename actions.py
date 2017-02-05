@@ -1,13 +1,16 @@
 import colorsys
 import yaml
 import os
-import time
 
 class Action(object):
+    ''' Base class for all actions. Every action will have a set
+    of tasks wich is a dictionary that comes from the yaml
+    '''
     def __init__(self, task):
         self.task = task
 
     def execute(self):
+        ''' this will be overridden by subclasses. '''
         pass
 
 
@@ -87,11 +90,20 @@ class HueLoadAction(BaseHueAction):
 
 class HueAction(BaseHueAction):
     '''
+    Basic action to do most things with a hue light
+
     items: [] #can be room, group or light name
     settings:    
         turn_on: <true or false>  
-        color: [r,g,b]
-        brightness: 0 - 255
+        color_rgb: [r,g,b] 
+        color_hsv: [h,s,v] 
+        color_cie: [x,y]
+        color_temp: 153 (6500K) to 500 (2000K)
+        brightness: 0 - 1
+    
+    Notes: 
+        * color_* options are mutually exclusive, only one may be used.
+        * for rgb,hsv,cie colors, range is 0-1
     '''
 
     def execute(self,bridge):
@@ -104,17 +116,31 @@ class HueAction(BaseHueAction):
                 command = {}
                 if 'turn_on' in self.task['settings']:
                     command['on'] = self.task['settings']['turn_on']
-                if 'color' in self.task['settings']:
-                    color = self.task['settings']['color']
-                    rgb = [float(c)/255.0 for c in color]
+                
+                if 'color_rgb' in self.task['settings']:
+                    rgb = self.task['settings']['color_rgb']
                     h,s,v = colorsys.rgb_to_hsv(*rgb)
-
+                    command['colormode'] = 'hs'
+                    command['hue'] = int(h*65535.0)
+                    command['sat'] = int(s*255.0)
+                elif 'color_hsv' in self.task['settings']:
+                    h,s,v = self.task['settings']['color_hsv']
+                    command['colormode'] = 'hs'
                     command['hue'] = int(h*65535.0)
                     command['sat'] = int(s*255.0)
                     command['bri'] = int(v*255.0)
-                    
+                elif 'color_cie' in self.task['settings']:
+                    x,y = self.task['settings']['color_cie']
+                    command['colormode'] = 'xy'
+                    command['xy'] = [x,y]
+                elif 'color_temp' in self.task['settings']:
+                    command['colormode'] = 'ct'
+                    command['ct'] = self.task['settings']['color_temp']
+
                 if 'brightness' in self.task['settings']:
-                    command['bri'] = int(self.task['settings']['brightness'])
+                    b = self.task['settings']['brightness']
+                    command['bri'] = int(b*255.0)
+                
                 if 'transition_time' in self.task['settings']:
                     command['transitiontime'] = \
                         int(self.task['settings']['transition_time'])

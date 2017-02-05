@@ -9,7 +9,7 @@
         settings:
             turn_on: true
             brightness: 25
-            color: [255,0,0]
+            color_cie: [0.7,0.3]
 - rule:
     - plex_condition:
         events: [media.pause]
@@ -21,7 +21,7 @@
         settings:
             turn_on: true
             brightness: 25
-            color: [0,0,255]
+            color_hsv: [0.666,1,1]
 - rule:
     - plex_condition:
         events: [media.play]
