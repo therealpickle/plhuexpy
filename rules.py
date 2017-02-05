@@ -1,4 +1,3 @@
-import yaml
 import colorsys
 
 class Condition(object):
@@ -68,15 +67,15 @@ class HueAction(Action):
                     light = bridge.get_light(item)
                     light_list.append(light['name'])
 
-        print light_list
         if len(light_list) > 0 and 'settings' in self.task.keys():
             for light in light_list:
                 command = {}
                 if 'turn_on' in self.task['settings']:
                     command['on'] = self.task['settings']['turn_on']
                 if 'color' in self.task['settings']:
-                    h,s,v = colorsys.rgb_to_hsv(*[float(c)/255.0 for c in self.task['settings']['color']])
-                    print h,s,v
+                    color = self.task['settings']['color']
+                    rgb = [float(c)/255.0 for c in color]
+                    h,s,v = colorsys.rgb_to_hsv(*rgb)
 
                     command['hue'] = int(h*65535.0)
                     command['sat'] = int(s*255.0)
@@ -84,21 +83,55 @@ class HueAction(Action):
                 if 'brightness' in self.task['settings']:
                     command['bri'] = int(self.task['settings']['brightness'])
                 if 'transition_time' in self.task['settings']:
-                    command['transitiontime'] = int(self.task['settings']['transition_time'])
+                    command['transitiontime'] = \
+                        int(self.task['settings']['transition_time'])
 
-                print light, command
+                print "Setting",light,"to",command
                 
                 bridge.set_light(light,command)
 
 class Rule(object):
-    def __init__(self,conditions,actions):
-        self.conditions = conditions
-        self.actions = actions
+    def __init__(self,element_list):
+        self.conditions = []
+        self.actions = []
+        for element in element_list:
+            if 'plex_condition' in element.keys():
+                cond = PlexCondition(element['plex_condition'])
+                self.conditions.append(cond)
+            elif 'hue_action' in element.keys():
+                act = HueAction(element['hue_action'])
+                self.actions.append(act)
+
+    def apply(self,hue_state,plex_state,bridge):
+        cond_tests = []
+        for cond in self.conditions:
+            if isinstance(cond, PlexCondition):
+                test = cond.test(plex_state)
+            cond_tests.append(test)
+
+        if False not in cond_tests:
+            for action in self.actions:
+                if isinstance(action,HueAction):
+                    action.execute(bridge)
 
 
+class RuleSet(object):
+    """docstring for RuleSet"""
+    def __init__(self, rule_list):
+        self.rules = []
+        for element in rule_list:
+            if 'rule' in element.keys():
+                self.rules.append(Rule(element['rule']))
+
+
+    def run(self,hue_state,plex_state,bridge):
+        for rule in self.rules:
+            rule.apply(hue_state,plex_state,bridge)
 
 
 if __name__ == '__main__':
+    import yaml
+
     test_req = '''
     plex:
         event: media.pause

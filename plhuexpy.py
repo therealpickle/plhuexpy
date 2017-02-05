@@ -4,8 +4,10 @@ import phue
 import yaml
 import time
 import json
+import os
 
-from rules import PlexCondition, HueAction
+
+from rules import RuleSet
 
 cherrypy.config.update({'server.socket_port': 38148,
                         'tools.encode.encoding': "utf-8",
@@ -14,6 +16,16 @@ cherrypy.config.update({'server.socket_port': 38148,
                        })
 
 class PlexHandler(object):
+    def __init__(self,rule_file):
+        super(PlexHandler,self).__init__()
+
+        if os.path.exists(rule_file):
+            with open(rule_file,'r') as f:
+                self.rule_set = RuleSet(yaml.load(f))
+        else:
+            self.rule_set = None
+            print "Rule file does not exist."
+
     @cherrypy.expose
     def index(self, *args, **kwargs):
         plex_state = json.loads(kwargs['payload'])
@@ -21,64 +33,27 @@ class PlexHandler(object):
             plex_thumb = kwargs['thumb']
         else:
             plex_thumb = None
-        
+
         hue_state = bridge.get_api()
 
-        # print hue_state
-        # print plex_state
-        
-        req = '''
-        events: [media.play,media.resume]
-        players:
-            local: [true]
-            title: [Plex Web (Chrome)]
-        '''
-        
-        # condition test
-        cond = PlexCondition(yaml.load(req))
-        res = cond.test(plex_state)
-        # print res
-        
+        if self.rule_set is not None:
+            self.rule_set.run(hue_state,plex_state,bridge)
 
 
-
-        # action test
-        task_on = '''
-        items: ["Mason's Nightstand"]
-        settings:
-            turn_on: true
-            brightness: 25
-            color: [255,0,0]
-        '''
-
-        task_off = '''
-        items: ["Mason's Nightstand"]
-        settings:
-            turn_on: true
-            brightness: 25
-            color: [0,0,255]
-        '''
-
-
-        action_on = HueAction(yaml.load(task_on))
-        action_off = HueAction(yaml.load(task_off))
-        
-        if res:
-            print "off"
-            action_off.execute(bridge)
-        else:
-            print "on"
-            action_on.execute(bridge)
-
-        # lights = bridge.get_light_objects('name')
-        # for light in ['Bedroom Ceiling Color 1','Bedroom Ceiling Color 2']:
-        #     if light in lights.keys():
-        #         lights[light].on = not res
-        #         print lights[light]
 
 if __name__ == '__main__':
+    import argparse
 
-    bridge = phue.Bridge('10.0.1.128')
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-r','--rules', dest="rules",
+        default='plhuexpy_rules.yaml')
+    parser.add_argument('-b','--bridge-ip', dest='bridge_ip',
+        default = '10.0.1.128')
+
+    args = parser.parse_args()
+
+    bridge = phue.Bridge(args.bridge_ip)
     
     connected = False
     while not connected:
@@ -90,4 +65,4 @@ if __name__ == '__main__':
             print "Hue bridge connection failed."
             time.sleep(2)
 
-    cherrypy.quickstart(PlexHandler())
+    cherrypy.quickstart(PlexHandler(args.rules))
