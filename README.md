@@ -64,10 +64,8 @@ A python server to control Hue lights with Plex webhooks. Rules are set with a y
 `http://<server_address>:38148`
 
 # Wishlist / ToDo
-* add scene handling in hue action
 * web interface to setup rules
     * Start easy and maybe just have a web interface to edit yaml
-* add support for other color spaces
 * daemonize
 * add server port to CL args
 * named action/conditions. can be used multiple times in rules
