@@ -131,3 +131,11 @@ Loads light states from a previously saved state
     name: <name of state to load>
     transition_time: <integer of deciseconds>
 ```
+
+### Hue Run Scene Action
+Actives a scene.
+```yaml
+- hue_activate_scene:
+    name: <name of the scene to activate>
+    group: <room or qroup the scene is for>
+```

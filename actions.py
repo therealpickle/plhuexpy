@@ -149,3 +149,16 @@ class HueAction(BaseHueAction):
                 
                 bridge.set_light(light,command)
 
+class HueRunSceneAction(BaseHueAction):
+    '''
+    Actives a scene.
+    - hue_activate_scene:
+        name: <name of the scene to activate>
+        group: <room or qroup the scene is for>
+    '''
+    def execute(self,bridge):
+        if 'name' in self.task.keys() and 'group' in self.task.keys():
+            bridge.run_scene(self.task['group'],self.task['name'])
+
+
+

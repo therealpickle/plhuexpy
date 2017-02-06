@@ -1,11 +1,13 @@
 from conditions import PlexCondition
-from actions import HueAction,HueSaveAction,BaseHueAction,HueLoadAction
+from actions import HueAction,HueSaveAction,BaseHueAction,HueLoadAction, \
+    HueRunSceneAction
 
 # keyword_map maps the yaml keyword to the action/condition object
 action_map = {
     'hue_action': HueAction,
     "hue_save_action": HueSaveAction,
     "hue_load_action": HueLoadAction,
+    "hue_run_scene_action": HueRunSceneAction,
 }
 
 condition_map = {

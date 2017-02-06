@@ -45,3 +45,12 @@
     - hue_load_action: 
         name: before_play
         transition_time: 30
+- rule:
+    - plex_condition:
+        events: [media.rate]
+        players:
+            local: [true]
+            title: [Plex Web (Chrome)]
+    - hue_run_scene_action:
+        group: Bedroom
+        name: Bright
